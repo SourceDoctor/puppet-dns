@@ -7,7 +7,7 @@ define dns::record::cname (
   $data,
   $ttl = '',
   $host = $name,
-  $data_dir = $::dns::server::config::data_dir,
+  $data_dir = $dns::data_dir,
 ) {
 
   $alias = "${name},CNAME,${zone}"
@@ -18,7 +18,7 @@ define dns::record::cname (
     default => "${data}."
   }
 
-  dns::record { $alias:
+  dns::record::record_base { $alias:
     zone     => $zone,
     host     => $host,
     ttl      => $ttl,

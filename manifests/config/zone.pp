@@ -163,9 +163,10 @@
 #   *allow_forwarder* and *forward_policy* to be set).
 #   Defaults to `master`.
 #
-define dns::zone (
+define dns::config::zone (
   $soa = $::fqdn,
   $soa_email = "root.${::fqdn}",
+  $zone_name = $name,
   $zone_ttl = '604800',
   $zone_refresh = '604800',
   $zone_retry = '86400',
@@ -184,12 +185,17 @@ define dns::zone (
   $zone_notify = undef,
   $also_notify = [],
   $ensure = present,
-  $data_dir = $::dns::server::params::data_dir,
   $view = undef,
   $default_zone = false,
 ) {
 
-  $cfg_dir = $dns::server::params::cfg_dir
+  $cfg_dir = $dns::cfg_dir
+  $data_dir = $dns::data_dir
+
+  $owner = $dns::owner
+  $group = $dns::group
+
+  $rfc1912_zones_cfg = $dns::config::params::rfc1912_zones_cfg
 
   validate_array($allow_transfer)
   validate_array($allow_forwarder)
@@ -205,9 +211,9 @@ define dns::zone (
   }
 
   $zone = $reverse ? {
-    'reverse' => join(reverse(split("arpa.in-addr.${name}", '\.')), '.'),
-    true      => "${name}.in-addr.arpa",
-    default   => $name
+    'reverse' => join(reverse(split("arpa.in-addr.${zone_name}", '\.')), '.'),
+    true      => "${zone_name}.in-addr.arpa",
+    default   => $zone_name
   }
 
   validate_string($zone_type)
@@ -217,7 +223,7 @@ define dns::zone (
     fail("The zone_type must be one of [${valid_zone_type_array}]")
   }
 
-  $zone_file = "${data_dir}/db.${name}"
+  $zone_file = "${data_dir}/db.${zone_name}"
   $zone_file_stage = "${zone_file}.stage"
 
   validate_array($allow_update)
@@ -247,14 +253,13 @@ define dns::zone (
 
     # Create "fake" zone file without zone-serial
     concat { $zone_file_stage:
-      owner   => $dns::server::params::owner,
-      group   => $dns::server::params::group,
+      owner   => $owner,
+      group   => $group,
       mode    => '0644',
       replace => $zone_replace,
-      require => Class['dns::server'],
       notify  => Exec["bump-${zone}-serial"]
     }
-    concat::fragment{"db.${name}.soa":
+    concat::fragment{"db.${zone_name}.soa":
       target  => $zone_file_stage,
       order   => 1,
       content => template("${module_name}/zone_file.erb")
@@ -273,10 +278,9 @@ define dns::zone (
       path        => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'],
       refreshonly => true,
       provider    => posix,
-      user        => $dns::server::params::owner,
-      group       => $dns::server::params::group,
-      require     => Class['dns::server::install'],
-      notify      => Class['dns::server::service'],
+      user        => $owner,
+      group       => $group,
+      notify      => Class['dns::config::service'],
     }
   } else {
     # For any zone file that is not a master zone, we should make sure
@@ -288,17 +292,16 @@ define dns::zone (
 
   # Include Zone in named.conf.local or view file
   $target = $default_zone ? {
-    true    => $dns::server::params::rfc1912_zones_cfg,
-    default => $view ? {
-      undef =>  "${cfg_dir}/named.conf.local",
-      '' =>  "${cfg_dir}/named.conf.local",
-      default =>  "${cfg_dir}/view-${view}.conf",
+    true      => $rfc1912_zones_cfg,
+    default   => $view ? {
+      undef   => "${cfg_dir}/named.conf.local",
+      ''      => "${cfg_dir}/named.conf.local",
+      default => "${cfg_dir}/view-${view}.conf",
     }
   }
-  concat::fragment{"named.conf.local.${name}.include":
+  concat::fragment{"named.conf.local.${zone_name}.include":
     target  => $target,
     order   => 3,
     content => template("${module_name}/zone.erb"),
   }
-
 }

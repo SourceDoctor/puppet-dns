@@ -17,7 +17,7 @@
 #   secret    => "dTIxGBPjkT/8b6BYHTUA=="
 # }
 #
-define dns::tsig (
+define dns::config::tsig (
   $keyname   = $name,
   $algorithm = 'hmac-md5',
   $server    = undef,
@@ -25,15 +25,14 @@ define dns::tsig (
   $ensure    = present
 ) {
 
-  $cfg_dir   = $dns::server::params::cfg_dir # Used in a template
-  validate_string($name)
+  $cfg_dir = $dns::cfg_dir
+  validate_string($keyname)
 
   if $ensure == 'present' {
-    concat::fragment { "named.conf.local.tsig.${name}.include":
+    concat::fragment { "named.conf.local.tsig.${keyname}.include":
       target  => "${cfg_dir}/named.conf.local",
       order   => 4,
       content => template("${module_name}/tsig.erb"),
     }
   }
-
 }

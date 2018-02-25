@@ -1,26 +1,35 @@
 {
-  "name": "ajjahn-dns",
-  "version": "2.1.1",
-  "author": "Adam Jahn",
+  "name": "puppet-dns",
+  "version": "0.9.0",
+  "author": "Thomas Berberich",
   "summary": "Module for provisioning DNS (bind9)",
   "license": "Apache-2.0",
-  "source": "https://github.com/ajjahn/puppet-dns",
-  "project_page": "https://github.com/ajjahn/puppet-dns",
-  "issues_url": "https://github.com/ajjahn/puppet-dns/issues",
+  "source": "https://github.com/SourceDoctor/puppet-dns",
+  "project_page": "https://github.com/SourceDoctor/puppet-dns",
+  "issues_url": "https://github.com/SourceDoctor/puppet-dns/issues",
   "description": "Module for provisioning DNS (bind9)",
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "5.0",
-        "6.0"
+        "6.0",
+        "5.0"
       ]
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
+        "17.04",
+        "16.04",
         "12.04",
         "10.04"
+      ]
+    },
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "9",
+        "8"
       ]
     }
   ],

@@ -1,35 +1,44 @@
-# == Define dns::record
 #
-# This is a private class to arbitary dns records.
-#
-define dns::record (
-  $zone,
-  $host,
-  $data,
-  $record = 'A',
-  $dns_class = 'IN',
-  $ttl = '',
-  $preference = false,
-  $order = 9,
-  $data_dir = $::dns::server::params::data_dir,
+class dns::record (
+  Optional[Hash] $a     = undef,
+  Optional[Hash] $aaaa  = undef,
+  Optional[Hash] $cname = undef,
+  Optional[Hash] $mx    = undef,
+  Optional[Hash] $ns    = undef,
+  Optional[Hash] $srv   = undef,
+  Optional[Hash] $txt   = undef,
+  Optional[Hash] $ptr   = undef,
 ) {
 
-  $zone_file_stage = "${data_dir}/db.${zone}.stage"
-
-  # lint:ignore:only_variable_string
-  if "${ttl}" !~ /^[0-9SsMmHhDdWw]+$/ and $ttl != '' {
-  # lint:endignore:only_variable_string
-    fail("Define[dns::record]: TTL ${ttl} must be an integer within 0-2147483647 or explicitly specified time units, e.g. 1h30m.")
+  if $a {
+    create_resources('dns::record::a', $a)
   }
 
-  if is_integer($ttl) and !(($ttl + 0) >= 0 and ($ttl+ 0) <= 2147483647) {
-    fail("Define[dns::record]: TTL ${ttl} must be an integer within 0-2147483647 or explicitly specified time units, e.g. 1h30m.")
+  if $aaaa {
+    create_resources('dns::record::aaaa', $aaaa)
   }
 
-  concat::fragment{"db.${zone}.${name}.record":
-    target  => $zone_file_stage,
-    order   => $order,
-    content => template("${module_name}/zone_record.erb")
+  if $cname {
+    create_resources('dns::record::cname', $cname)
   }
 
+  if $mx {
+    create_resources('dns::record::mx', $mx)
+  }
+
+  if $ns {
+    create_resources('dns::record::ns', $ns)
+  }
+
+  if $srv {
+    create_resources('dns::record::srv', $srv)
+  }
+
+  if $txt {
+    create_resources('dns::record::txt', $txt)
+  }
+
+  if $ptr {
+    create_resources('dns::record::ptr', $ptr)
+  }
 }

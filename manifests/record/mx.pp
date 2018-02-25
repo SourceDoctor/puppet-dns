@@ -8,7 +8,7 @@ define dns::record::mx (
   $ttl        = '',
   $preference = 10,
   $host       = '@',
-  $data_dir = $::dns::server::config::data_dir,
+  $data_dir = $dns::data_dir,
 ) {
 
   $alias = "${name},${zone},MX,${preference},${data}"
@@ -40,7 +40,7 @@ define dns::record::mx (
     fail("Define[dns::record::mx]: MX host label ${host} must be a valid hostname or '@' to signify \$ORIGIN.")
   }
 
-  dns::record { $alias:
+  dns::record::record_base { $alias:
     zone       => $zone,
     host       => $host,
     ttl        => $ttl,

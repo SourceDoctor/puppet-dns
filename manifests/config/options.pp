@@ -1,6 +1,4 @@
-# == Define: dns::server::options
-#
-# BIND server template-based configuration definition.
+# BIND config template-based configuration definition.
 #
 # === Parameters
 #
@@ -13,9 +11,9 @@
 #   Default: empty, meaning "any"
 #
 # [*also_notify*]
-#   The list of servers to which additional zone-change notifications
+#   The list of configs to which additional zone-change notifications
 #   should be sent.
-#   Default: empty, meaning no additional servers
+#   Default: empty, meaning no additional configs
 #
 # [*check_names_master*]
 #   Restrict the character set and syntax of master zones.
@@ -99,7 +97,7 @@
 #
 # [*notify_source*]
 #   The source IP address from which to send notifies.
-#   Default: undef, meaning the primary IP address of the DNS server,
+#   Default: undef, meaning the primary IP address of the DNS config,
 #   as determined by BIND.
 #
 # [*query_log_enable*]
@@ -129,11 +127,11 @@
 #
 # [*transfer_source*]
 #   The source IP address from which to respond to transfer requests.
-#   Default: undef, meaning the primary IP address of the DNS server,
+#   Default: undef, meaning the primary IP address of the DNS config,
 #   as determined by BIND.
 #
 # [*zone_notify*]
-#   Controls notifications when a zone for which this server is
+#   Controls notifications when a zone for which this config is
 #   authoritative changes.  String of yes (send notifications to zone's
 #   NS records and to also-notify list), no (no notifications are sent),
 #   master-only (only send notifications for master zones), or explicit
@@ -150,139 +148,52 @@
 #
 # === Examples
 #
-#  dns::server::options { '/etc/bind/named.conf.options':
+#  dns::options { '/etc/bind/named.conf.options':
 #    forwarders => [ '8.8.8.8', '8.8.4.4' ],
 #   }
 #
-include dns::server::params
-define dns::server::options (
-  $allow_query = [],
-  $allow_recursion = [],
-  $also_notify = [],
-  $check_names_master = undef,
-  $check_names_slave = undef,
-  $check_names_response = undef,
+class dns::config::options (
+  $allow_query = $::dns::allow_query,
+  $allow_recursion = $::dns::allow_recursion,
+  $also_notify = $::dns::also_notify,
+  $check_names_master = $::dns::check_names_master,
+  $check_names_slave = $::dns::check_names_slave,
+  $check_names_response = $::dns::check_names_reponse,
   $control_channel_ip = undef,
   $control_channel_port = undef,
   $control_channel_allow = undef,
-  $data_dir = $::dns::server::params::data_dir,
-  $dnssec_validation = $::dns::server::params::default_dnssec_validation,
-  $dnssec_enable = $::dns::server::params::default_dnssec_enable,
-  $forward_policy = undef,
-  $forwarders = [],
-  $listen_on = [],
-  $listen_on_ipv6 = [],
-  $listen_on_port = undef,
-  $log_channels = {},
-  $log_categories = {},
-  $no_empty_zones = false,
-  $notify_source = undef,
-  $query_log_enable = undef,
-  $statistic_channel_ip = undef,
-  $statistic_channel_port = undef,
-  $statistic_channel_allow = undef,
-  $transfers = [],
-  $transfer_source = undef,
-  $working_dir = $::dns::server::params::working_dir,
-  $zone_notify = undef,
-  $extra_options = {},
-) {
-  $valid_check_names = ['fail', 'warn', 'ignore']
-  $valid_forward_policy = ['first', 'only']
-  $cfg_dir = $::dns::server::params::cfg_dir
+  $cfg_dir = $dns::cfg_dir,
+  $data_dir = $dns::data_dir,
+  $dnssec_enable = $::dns::dnssec_enable,
+  $dnssec_validation = $::dns::dnssec_validation,
+  $forward_policy = $::dns::forward_policy,
+  $forwarders = $::dns::forwarders,
+  $listen_on = $::dns::listen_on,
+  $listen_on_ipv6 = $::dns::listen_on_ipv6,
+  $listen_on_port = $::dns::listen_on_port,
+  $log_channels = $::dns::log_channels,
+  $log_categories = $::dns::log_categories,
+  $no_empty_zones = $::dns::no_empty_zones,
+  $notify_source = $::dns::notify_source,
+  $query_log_enable = $::dns::query_log_enable,
+  $statistic_channel_ip = $::dns::statistic_channel_ip,
+  $statistic_channel_port = $::dns::statistic_channel_port,
+  $statistic_channel_allow = $::dns::statistic_channel_allow,
+  $transfers = $::dns::transfers,
+  $transfer_source = $::dns::transfer_source,
+  $working_dir = $dns::working_dir,
+  $zone_notify = $::dns::zone_notify,
+  $extra_options = $::dns::extra_options,
 
-  if ! defined(Class['::dns::server']) {
-    fail('You must include the ::dns::server base class before using any dns options defined resources')
-  }
+) inherits dns {
 
-  validate_string($forward_policy)
-  if $forward_policy != undef and !member($valid_forward_policy, $forward_policy) {
-    fail("The forward_policy must be ${valid_forward_policy}")
-  }
-  validate_array($forwarders)
-  validate_array($transfers)
-  validate_array($listen_on)
-  validate_array($listen_on_ipv6)
-  validate_array($allow_recursion)
-  if $check_names_master != undef and !member($valid_check_names, $check_names_master) {
-    fail("The check name policy check_names_master must be ${valid_check_names}")
-  }
-  if $check_names_slave != undef and !member($valid_check_names, $check_names_slave) {
-    fail("The check name policy check_names_slave must be ${valid_check_names}")
-  }
-  if $check_names_response != undef and !member($valid_check_names, $check_names_response) {
-    fail("The check name policy check_names_response must be ${valid_check_names}")
-  }
-  validate_array($allow_query)
-
-  if $statistic_channel_port != undef and !is_numeric($statistic_channel_port) {
-    fail('The statistic_channel_port is not a number')
-  }
-
-  if $statistic_channel_ip != undef and (!is_string($statistic_channel_ip) or !is_ip_address($statistic_channel_ip)) {
-    fail('The statistic_channel_ip is not an ip string')
-  }
-
-  if $statistic_channel_allow != undef {
-    validate_array($statistic_channel_allow)
-  }
-
-  if $control_channel_port != undef and !is_numeric($control_channel_port) {
-    fail('The control_channel_port is not a number')
-  }
-
-  if $control_channel_ip != undef and (!is_string($control_channel_ip) or !is_ip_address($control_channel_ip)) {
-    fail('The control_channel_ip is not an ip string')
-  }
-
-  if $control_channel_allow != undef {
-    validate_array($control_channel_allow)
-  }
-
-  validate_array($also_notify)
-
-  $valid_zone_notify = ['yes', 'no', 'explicit', 'master-only']
-  if $zone_notify != undef and !member($valid_zone_notify, $zone_notify) {
-    fail("The zone_notify must be ${valid_zone_notify}")
-  }
-
-  $valid_dnssec_validation = ['yes', 'no', 'auto', 'absent']
-  if $dnssec_validation != undef and !member($valid_dnssec_validation, $dnssec_validation) {
-    fail("The dnssec_validation must be ${valid_dnssec_validation}")
-  }
-
-  validate_bool($no_empty_zones)
-
-  validate_bool($dnssec_enable)
-  if (! $dnssec_enable) and ($dnssec_validation != undef) {
-    warning('dnssec_enable is false. dnssec_validation will be ignored.')
-  }
-
-  if $notify_source != undef and !is_ip_address($notify_source) {
-    fail('The notify_source is not an ip string')
-  }
-
-  if $transfer_source != undef and !is_ip_address($transfer_source) {
-    fail('The transfer_source is not an ip string')
-  }
-
-  # validate these, just in case they're overridden
-  validate_absolute_path($data_dir)
-  validate_absolute_path($working_dir)
-
-  validate_hash($log_channels)
-  validate_hash($log_categories)
-
-  validate_hash($extra_options)
-
-  file { $title:
+  file { "${cfg_dir}/named.conf.options":
     ensure  => present,
-    owner   => $::dns::server::params::owner,
-    group   => $::dns::server::params::group,
+    owner   => $dns::owner,
+    group   => $dns::group,
     mode    => '0644',
-    require => [File[$cfg_dir], Class['::dns::server::install']],
+    require => [File[$cfg_dir], Class['::dns::config::install']],
     content => template("${module_name}/named.conf.options.erb"),
-    notify  => Class['dns::server::service'],
+    notify  => Class['dns::config::service'],
   }
-
 }

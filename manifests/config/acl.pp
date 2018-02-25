@@ -14,18 +14,20 @@
 #   data   => [ '10.0.0.0/8', '172.16.2.0/24', ]
 # }
 #
-define dns::acl (
+define dns::config::acl (
   $ensure = present,
   $aclname = $name,
   $data = [],
 ) {
-  include dns::server::params
+  include dns::config::params
+
+  $cfg_dir = $dns::cfg_dir
 
   validate_string($aclname)
   validate_array($data)
 
-  concat::fragment { "named.conf.local.acl.${name}.include":
-    target  => "${dns::server::params::cfg_dir}/named.conf.local",
+  concat::fragment { "named.conf.local.acl.${aclname}.include":
+    target  => "${cfg_dir}/named.conf.local",
     order   => 2,
     content => template("${module_name}/acl.erb"),
   }

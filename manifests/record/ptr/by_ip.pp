@@ -78,7 +78,7 @@ define dns::record::ptr::by_ip (
   $zone = undef,
   $ttl = undef,
   $ip = $name,
-  $data_dir = $::dns::server::config::data_dir,
+  $data_dir = $dns::data_dir,
 ) {
 
   # split the IP address up into three host/zone pairs based on class A, B, or C splits:
@@ -95,13 +95,13 @@ define dns::record::ptr::by_ip (
 
   # choose the most specific defined reverse zone file (class C, then B, then A).
   # Default to class C if none are defined.
-  if defined(Dns::Zone[$class_c_zone]) {
+  if defined(Dns::Config::Zone[$class_c_zone]) {
     $reverse_zone = $class_c_zone
     $octet = $class_c_host
-  } elsif defined(Dns::Zone[$class_b_zone]) {
+  } elsif defined(Dns::Config::Zone[$class_b_zone]) {
     $reverse_zone = $class_b_zone
     $octet = $class_b_host
-  } elsif defined(Dns::Zone[$class_a_zone]) {
+  } elsif defined(Dns::Config::Zone[$class_a_zone]) {
     $reverse_zone = $class_a_zone
     $octet = $class_a_host
   } else {

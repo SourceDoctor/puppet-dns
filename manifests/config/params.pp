@@ -1,11 +1,9 @@
-# == Class dns::server::params
-#
-class dns::server::params {
+class dns::config::params {
   case $::osfamily {
     'Debian': {
       $cfg_dir            = '/etc/bind'
-      $cfg_file           = '/etc/bind/named.conf'
-      $data_dir           = '/var/lib/bind/zones'
+      $cfg_file           = "${cfg_dir}/named.conf"
+      $data_dir           = '/var/cache/bind'
       $working_dir        = '/var/cache/bind'
       $root_hint          = "${cfg_dir}/db.root"
       $rfc1912_zones_cfg  = "${cfg_dir}/named.conf.default-zones"
@@ -48,8 +46,29 @@ class dns::server::params {
       }
     }
     default: {
-      fail("dns::server is incompatible with this osfamily: ${::osfamily}")
+      fail("dns is incompatible with this osfamily: ${::osfamily}")
     }
   }
-  $ensure_packages = latest
+
+  $ensure_packages             = latest
+
+  $listen_on                   = []
+  $listen_on_ipv6              = []
+  $forwarders                  = []
+  $forward_policy              = undef
+  $listen_on_port              = undef
+  $transfers                   = []
+  $allow_recursion             = []
+  $allow_query                 = []
+  $check_names_master          = undef
+  $check_names_slave           = undef
+  $check_names_response        = undef
+  $zone_notify                 = undef
+  $also_notify                 = []
+  $no_empty_zones              = undef
+  $notify_source               = undef
+  $transfer_source             = undef
+  $log_channels                = {}
+  $log_categories              = {}
+  $extra_options               = {}
 }

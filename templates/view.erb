@@ -11,8 +11,8 @@ view <%= @viewname %> {
     <%= @match_destinations.join(";\n    ") %>;
   };
 <%- end %>
-<%- if @match_recursive_only -%>
-  match-recursive-only <%= @match_recursive_only %>;
+<%- unless @match_recursive_only.nil? -%>
+  match-recursive-only <%= @match_recursive_only? 'yes':'no' %>;
 <%- end -%>
 <%- if !@options.empty? -%>
   <%- @options.each do |k, v| -%>

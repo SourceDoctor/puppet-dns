@@ -41,12 +41,12 @@ ROOTDIR="<%= @rootdir %>"
 OPTIONS="<%= @options %>"
 <% end -%>
 
-<% if @enable_zone_write -%>
-ENABLE_ZONE_WRITE=<%= @enable_zone_write %>
+<% unless @enable_zone_write.nil? -%>
+ENABLE_ZONE_WRITE=<%= @enable_zone_write? 'yes':'no' %>
 <% end -%>
 
-<% if @enable_sdb -%>
-ENABLE_SDB=<%= @enable_sdb %>
+<% unless @enable_sdb.nil? -%>
+ENABLE_SDB=<%= @enable_sdb? 'yes':'no' %>
 <% end -%>
 
 <% if @disable_named_dbus -%>
@@ -57,6 +57,6 @@ DISABLE_NAMED_DBUS=<%= @disable_named_dbus %>
 KEYTAB_FILE="<%= @keytab_file %>"
 <% end -%>
 
-<% if @disable_zone_checking -%>
-DISABLE_ZONE_CHECKING=<%= @disable_zone_checking %>
+<% unless @disable_zone_checking.nil? -%>
+DISABLE_ZONE_CHECKING=<%= @disable_zone_checking? 'yes':'no' %>
 <% end -%>

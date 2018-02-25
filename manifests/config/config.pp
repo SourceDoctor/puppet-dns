@@ -1,13 +1,12 @@
-# == Class dns::server
 #
-class dns::server::config (
-  $cfg_dir              = $dns::server::params::cfg_dir,
-  $cfg_file             = $dns::server::params::cfg_file,
-  $data_dir             = $dns::server::params::data_dir,
-  $owner                = $dns::server::params::owner,
-  $group                = $dns::server::params::group,
+class dns::config::config (
+  $cfg_dir              = $dns::cfg_dir,
+  $cfg_file             = $dns::cfg_file,
+  $data_dir             = $dns::data_dir,
+  $owner                = $dns::config::params::owner,
+  $group                = $dns::config::params::group,
   $enable_default_zones = true,
-) inherits dns::server::params {
+) inherits dns::config::params {
 
   file { $cfg_dir:
     ensure => directory,
@@ -38,16 +37,16 @@ class dns::server::config (
     content => template("${module_name}/named.conf.erb"),
     require => [
       File[$cfg_dir],
-      Class['dns::server::install']
+      Class['dns::config::install']
     ],
-    notify  => Class['dns::server::service'],
+    notify  => Class['dns::config::service'],
   }
 
   concat { "${cfg_dir}/named.conf.local":
     owner  => $owner,
     group  => $group,
     mode   => '0644',
-    notify => Class['dns::server::service']
+    notify => Class['dns::config::service']
   }
 
   concat::fragment{'named.conf.local.header':
@@ -57,20 +56,17 @@ class dns::server::config (
   }
 
   # Configure default zones with a concat so we could add more zones in it
-  concat {$dns::server::params::rfc1912_zones_cfg:
+  concat {$dns::config::params::rfc1912_zones_cfg:
     owner          => $owner,
     group          => $group,
     mode           => '0644',
     ensure_newline => true,
-    notify         => Class['dns::server::service'],
+    notify         => Class['dns::config::service'],
   }
 
   concat::fragment {'default-zones.header':
-    target  => $dns::server::params::rfc1912_zones_cfg,
+    target  => $dns::config::params::rfc1912_zones_cfg,
     order   => '00',
     content => template('dns/named.conf.default-zones.erb'),
   }
-
-  include dns::server::default
-
 }

@@ -1,9 +1,8 @@
-# == Define dns::server::view
 #
-# `dns::server::view` defines a DNS view.
+# defines a DNS view.
 #
 # Zones to the view could be added by using the `zones` parameter of
-# `dns::server::view` or by declaring `dns::zone` resources with its `view`
+# `dns::view` or by declaring `dns::zone` resources with its `view`
 # parameter set to this resource name.
 #
 # === Parameters
@@ -43,7 +42,7 @@
 #   Hash of zones resources that should be included in this view.
 #   Defaults to empty (no zone is added).
 #
-define dns::server::view (
+define dns::config::view (
   $ensure               = 'present',
   $enable_default_zones = true,
   $match_clients        = [],
@@ -54,59 +53,62 @@ define dns::server::view (
   $viewname             = $name,
   $zones                = {},
 ) {
-  include ::dns::server::params
+#  include ::dns::params
+
+  $cfg_dir = $dns::cfg_dir
+  $data_dir = $dns::data_dir
+
+  $owner = $dns::owner
+  $group = $dns::group
+
+  $rfc1912_zones_cfg = $dns::config::params::rfc1912_zones_cfg
 
   $valid_ensure = ['present', 'absent']
-  $valid_yes_no = ['yes', 'no']
   if !member($valid_ensure, $ensure) {
     fail("ensure parameter must be ${valid_ensure}")
   }
   validate_bool($enable_default_zones)
   validate_array($match_clients)
   validate_array($match_destinations)
-  if $match_recursive_only {
-    if !member($valid_yes_no, $match_recursive_only) {
-      fail("match_recursive_only parameter must be ${valid_yes_no}")
-    }
+  if $match_recursive_only != undef {
+      validate_bool($match_recursive_only)
   }
   validate_hash($options)
   validate_string($order)
   validate_string($viewname)
   validate_hash($zones)
 
-  $rfc1912_zones_cfg = $dns::server::params::rfc1912_zones_cfg
-
-  concat { "${dns::server::params::cfg_dir}/view-${name}.conf":
+  concat { "${cfg_dir}/view-${viewname}.conf":
     ensure         => $ensure,
-    owner          => $dns::server::params::owner,
-    group          => $dns::server::params::group,
+    owner          => $owner,
+    group          => $group,
     mode           => '0644',
     ensure_newline => true,
-    notify         => Class['dns::server::service'],
+    notify         => Class['dns::config::service'],
   }
 
   if $ensure == 'present' {
-    concat::fragment {"view-${name}.header":
-      target  => "${dns::server::params::cfg_dir}/view-${name}.conf",
+    concat::fragment {"view-${viewname}.header":
+      target  => "${cfg_dir}/view-${viewname}.conf",
       order   =>  '00',
       content => template("${module_name}/view.erb"),
     }
 
-    concat::fragment {"view-${name}.tail":
-      target  => "${dns::server::params::cfg_dir}/view-${name}.conf",
+    concat::fragment {"view-${viewname}.tail":
+      target  => "${cfg_dir}/view-${viewname}.conf",
       order   => '99',
       content => '}; ',
     }
 
     # Include view configuration in main config
-    concat::fragment {"named.conf.local.view.${name}.include":
-      target  => "${dns::server::params::cfg_dir}/named.conf.local",
+    concat::fragment {"named.conf.local.view.${viewname}.include":
+      target  => "${cfg_dir}/named.conf.local",
       order   => $order,
-      content => "include \"${dns::server::params::cfg_dir}/view-${name}.conf\";\n",
-      require => Concat["${dns::server::params::cfg_dir}/view-${name}.conf"],
+      content => "include \"${cfg_dir}/view-${viewname}.conf\";\n",
+      require => Concat["${cfg_dir}/view-${viewname}.conf"],
     }
 
     # Create zone config
-    create_resources(dns::zone, $zones, { view => $name })
+    create_resources(dns::config::zone, $zones, { view => $viewname })
   }
 }

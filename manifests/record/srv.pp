@@ -11,14 +11,14 @@ define dns::record::srv (
   $target,
   $proto = 'tcp',
   $ttl = '',
-  $data_dir = $::dns::server::config::data_dir,
+  $data_dir = $dns::data_dir,
 ) {
 
   $alias = "${service}:${proto}@${target}:${port},${pri},${weight},SRV,${zone}"
 
   $host = "_${service}._${proto}.${zone}."
 
-  dns::record { $alias:
+  dns::record::record_base { $alias:
     zone     => $zone,
     host     => $host,
     ttl      => $ttl,

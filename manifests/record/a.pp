@@ -9,15 +9,16 @@ define dns::record::a (
   $ttl = '',
   $ptr = false,
   $host = $name,
-  $data_dir = $::dns::server::config::data_dir,
+  $data_dir = $dns::data_dir,
 ) {
 
   $alias = "${name},A,${zone}"
 
-  dns::record { $alias:
+  dns::record::record_base { $alias:
     zone     => $zone,
     host     => $host,
     ttl      => $ttl,
+    record   => 'A',
     data     => $data,
     data_dir => $data_dir,
   }

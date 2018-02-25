@@ -7,7 +7,7 @@ define dns::record::ns (
   $data,
   $ttl  = '',
   $host = $name,
-  $data_dir = $::dns::server::config::data_dir,
+  $data_dir = $dns::data_dir,
 ) {
 
   $alias = "${host},${zone},NS,${data}"
@@ -28,7 +28,7 @@ define dns::record::ns (
     fail("Define[dns::record::ns]: NS data ${data} must be a valid hostname.")
   }
 
-  dns::record { $alias:
+  dns::record::record_base { $alias:
     zone     => $zone,
     host     => $host,
     ttl      => $ttl,

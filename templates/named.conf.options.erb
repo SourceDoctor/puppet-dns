@@ -10,24 +10,24 @@ options {
     // Uncomment the following block, and insert the addresses replacing.
     // the all-0's placeholder.
 
-<% if @forwarders.size == 0 then -%>
-    // forwarders {
-    //     0.0.0.0;
-    // };
+<% if @forwarders.is_a?(Array) -%>
+    forwarders {
+<% @forwarders.each do |f| -%>
+      <%= f -%>;
+<% end -%>
+    };
+
 <% else -%>
     forwarders {
-    <%- @forwarders.each do |forwarder| -%>
-      <%= forwarder -%>;
-    <%- end -%>
+      <%= @forwarders -%>;
     };
 
 <% end -%>
-
-<% if @forward_policy then -%>
+<% if @forward_policy -%>
     forward <%= @forward_policy %>;
-<% end -%>
 
-<% if @transfers.size != 0 then -%>
+<% end -%>
+<% unless @transfers.empty? -%>
     allow-transfer {
     <%- @transfers.each do |transfer| -%>
       <%= transfer -%>;
@@ -35,18 +35,18 @@ options {
     };
 
 <% end -%>
-<% if @listen_on.size == 0 then -%>
-    listen-on { any; };
-
-<% else -%>
+<% unless @listen_on.empty? -%>
     listen-on {
     <%- @listen_on.each do |ipv4_addr| -%>
       <%= ipv4_addr -%>;
     <%- end -%>
     };
 
+<% else -%>
+    listen-on { any; };
+
 <% end -%>
-<% if @listen_on_ipv6.empty? then -%>
+<% if @listen_on_ipv6.empty? -%>
     listen-on-v6 { any; };
 
 <% else -%>
@@ -61,7 +61,7 @@ options {
     port <%= @listen_on_port %>;
 
 <% end -%>
-<% if @allow_recursion.size != 0 then -%>
+<% unless @allow_recursion.empty? -%>
     allow-recursion {
     <%- @allow_recursion.each do |recursion| -%>
       <%= recursion -%>;
@@ -69,7 +69,7 @@ options {
     };
 
 <% end -%>
-<% if @allow_query.size != 0 then -%>
+<% unless @allow_query.empty? -%>
     allow-query {
     <%- @allow_query.each do |query| -%>
       <%= query -%>;
@@ -92,7 +92,7 @@ options {
 <% if @zone_notify -%>
     notify <%= @zone_notify %>;
 <% end -%>
-<% if @also_notify.size != 0 then -%>
+<% unless @also_notify.empty? -%>
     also-notify {
         <%- @also_notify.each do |ip| -%>
         <%= ip -%>;
@@ -100,8 +100,8 @@ options {
     };
 
 <% end -%>
-<% if @no_empty_zones -%>
-    empty-zones-enable no;
+<% unless @no_empty_zones.nil? -%>
+    empty-zones-enable <%= @no_empty_zones? 'no':'yes' %>;
 
 <% end -%>
 <% if @notify_source -%>
