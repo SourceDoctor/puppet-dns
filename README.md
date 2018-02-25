@@ -1,56 +1,40 @@
 # Puppet DNS (BIND9) Module
 
-[![Build Status](https://travis-ci.org/ajjahn/puppet-dns.png?branch=master)](https://travis-ci.org/ajjahn/puppet-dns)
+[![Build Status](https://travis-ci.org/SourceDoctor/puppet-dns.png?branch=master)](https://travis-ci.org/SourceDoctor/puppet-dns)
 
 Module for provisioning DNS (bind9)
 
 Supports:
 
-* Ubuntu: 14.04, 12.04
+* Ubuntu: 17.04, 16.04, 14.04, 12.04
+* Debian: 9, 8
 * CentOS: 7.x, 6.x
 
-Patches to support other operating systems are welcome.
+## About
+This is a partial rewrite of [ajjahn puppet-dns](https://github.com/ajjahn/puppet-dns)
+for supporting hiera
 
-This module depends on concat (https://github.com/puppetlabs/puppet-concat).
-
-This module ''will'' overwrite all bind configuration, it is not safe to apply
-to a server with an existing bind configuration.
-
-## Installation
-
-Clone this repo to your Puppet modules directory
-
-    git clone git://github.com/ajjahn/puppet-dns.git dns
-
-or
-
-    puppet module install ajjahn/dns
 
 ## Usage
 
-Tweak and add the following to your site manifest:
-
 ```puppet
 node 'server.example.com' {
-  include dns::server
 
-  # Forwarders
-  dns::server::options { '/etc/bind/named.conf.options':
-    forwarders => [ '8.8.8.8', '8.8.4.4' ]
-  }
-
-  # Forward Zone
-  dns::zone { 'example.com':
-    soa         => 'ns1.example.com',
-    soa_email   => 'admin.example.com',
-    nameservers => ['ns1']
-  }
-
-  # Reverse Zone
-  dns::zone { '1.168.192.IN-ADDR.ARPA':
-    soa         => 'ns1.example.com',
-    soa_email   => 'admin.example.com',
-    nameservers => ['ns1']
+  # DNS Settings and Zone Configuration
+  class { 'dns':
+    forwarders => [ '8.8.8.8',
+                    '8.8.4.4' ],
+    zone       => { 'example.com' => {
+                        soa         => 'ns1.example.com',
+                        soa_email   => 'admin.example.com',
+                        nameservers => ['ns1']
+                      },
+                    'example2.com' => {
+                        soa         => 'ns2.example2.com',
+                        soa_email   => 'admin.example2.com',
+                        nameservers => ['ns2']
+                      },
+      }
   }
 
   # A Records:
@@ -103,11 +87,13 @@ node 'server.example.com' {
   }
 
   # TSIG
-  dns::tsig { 'ns3' :
-    ensure    => present,
-    algorithm => "hmac-md5",
-    secret    => "La/E5CjG9O+os1jq0a2jdA==",
-    server    => "192.168.1.3"
+  class { 'dns':
+    tsig => { 'ns3' :
+                ensure    => present,
+                algorithm => "hmac-md5",
+                secret    => "La/E5CjG9O+os1jq0a2jdA==",
+                server    => "192.168.1.3"
+            }
   }
 
 }
@@ -116,86 +102,59 @@ node 'server.example.com' {
 You can also declare forwarders for a specific zone, if you don't have one in the dns::option.
 
 ```puppet
-dns::zone { 'example.com':
-  soa             => 'ns1.example.com',
-  soa_email       => 'admin.example.com',
-  allow_forwarder => ['8.8.8.8'],
-  forward_policy  => 'first',
-  nameservers     => ['ns1'],
-}
+  class { 'dns':
+    zone => { 'example.com' => {
+                  soa         => 'ns1.example.com',
+                  soa_email   => 'admin.example.com',
+                  allow_forwarder => ['8.8.8.8'],
+                  forward_policy  => 'first',
+                  nameservers => ['ns1']
+                },
+      }
+  }
 ```
 
 You can change the checking of the domain name. The policy can be either warn fail or ignore.
 
 ```puppet
-dns::server::options { '/etc/bind/named.conf.options':
-  check_names_master => 'fail',
-  check_names_slave  => 'warn',
-  forwarders         => [ '8.8.8.8', '4.4.4.4' ],
-}
+  class { 'dns':
+    check_names_master => 'fail',
+    check_names_slave  => 'warn',
+    forwarders => [ '8.8.8.8',
+                    '8.8.4.4' ],
+  }
 ```
 
 You can enable the report of bind stats trough the `statistics-channels` using:
 
 ```puppet
-dns::server::options { '/etc/bind/named.conf.options':
-  check_names_master     => 'fail',
-  check_names_slave      => 'warn',
-  forwarders             => [ '8.8.8.8', '4.4.4.4' ],
-  statistic_channel_ip   => '127.0.0.1',
-  statistic_channel_port => 8053
-}
+  class { 'dns':
+      check_names_master     => 'fail',
+      check_names_slave      => 'warn',
+      forwarders             => [ '8.8.8.8', '4.4.4.4' ],
+      statistic_channel_ip   => '127.0.0.1',
+      statistic_channel_port => 8053
+  }
 ```
 
 You can also create dynamic zones. Mind they are only created once by puppet and never replaced unless allow_update is empty.
 
 ```puppet
 dns::zone {
-  soa             => 'ns1.example.com',
-  soa_email       => 'admin.example.com',
-  allow_forwarder => ['8.8.8.8'],
-  allow_update    => ['192.168.1.2', '192.168.1.3'],
-  forward_policy  => 'first',
-  nameservers     => ['ns1'],
 }
-```
 
-### Exported resource patterns
-
-```puppet
-node default {
-  # Other nodes export an A record for their hostname
-  @@dns::record::a { $::hostname:
-    zone => $::domain,
-    data => $::ipaddress,
+  class { 'dns':
+    zone => { 'example.com' => {
+              soa             => 'ns1.example.com',
+              soa_email       => 'admin.example.com',
+              allow_forwarder => ['8.8.8.8'],
+              allow_update    => ['192.168.1.2', '192.168.1.3'],
+              forward_policy  => 'first',
+              nameservers     => ['ns1'],
+            },
+        }
   }
-}
-
-node 'ns1.xkyle.com' {
-  dns::zone { $::domain:
-    soa         => $::fqdn,
-    soa_email   => "admin.${::domain}",
-    nameservers => [ 'ns1' ],
-  }
-  # Collect all the records from other nodes
-  Dns::Record::A <<||>>
-}
 ```
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-## Authors
-
-Note: This module is a merge of the work from the following authors:
-* [ajjahn](https://github.com/ajjahn/puppet-dns)
-* [Danzilio](https://github.com/danzilio)
-* [solarkennedy](https://github.com/solarkennedy)
 
 ## License
 
