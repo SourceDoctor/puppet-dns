@@ -69,6 +69,10 @@
 # [*forwarders*]
 #   Array of forwarders IP addresses. Default: empty
 #
+# [*response_policy_zones*]
+#   Array of response policy zones. Default: empty
+#   allows local overwrite of DNS Response to requesting Client
+#
 # [*listen_on*]
 #   Array of IP addresses on which to listen. Default: empty, meaning "any"
 #
@@ -168,6 +172,7 @@ class dns::config::options (
   $dnssec_validation = $::dns::dnssec_validation,
   $forward_policy = $::dns::forward_policy,
   $forwarders = $::dns::forwarders,
+  $response_policy_zones = $::dns::response_policy_zones,
   $listen_on = $::dns::listen_on,
   $listen_on_ipv6 = $::dns::listen_on_ipv6,
   $listen_on_port = $::dns::listen_on_port,

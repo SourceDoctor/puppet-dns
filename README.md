@@ -20,11 +20,15 @@ The differences/advantages:
 * Code was rewritten mostly for handling Puppet4 features
 * **full hiera support**
 * full support of Debian
+* handling of Response Policy Zones
 
 
 ## Usage
 
 ```puppet
+include dns
+include dns::record
+
 node 'server.example.com' {
 
   # DNS Settings and Zone Configuration
@@ -102,7 +106,6 @@ node 'server.example.com' {
                 server    => "192.168.1.3"
             }
   }
-
 }
 ```
 
@@ -147,9 +150,6 @@ You can enable the report of bind stats trough the `statistics-channels` using:
 You can also create dynamic zones. Mind they are only created once by puppet and never replaced unless allow_update is empty.
 
 ```puppet
-dns::zone {
-}
-
   class { 'dns':
     zone => { 'example.com' => {
               soa             => 'ns1.example.com',
@@ -163,3 +163,21 @@ dns::zone {
   }
 ```
 
+Create a DNS forwarder and overrule rules with the response-policy. This is supported from BIND 9.8+
+
+```puppet
+include dns
+include dns::record
+
+class { 'dns':
+  forwarders            => ['8.8.8.8', '8.8.4.4'],
+  response_policy_zones => ['rpz'],
+  zone                  => { 'rpz': }
+}
+
+dns::record::a {
+  'test.example.tld.':
+    zone => 'rpz',
+    data => ['127.0.0.1']
+}
+```

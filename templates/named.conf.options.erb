@@ -27,6 +27,14 @@ options {
     forward <%= @forward_policy %>;
 
 <% end -%>
+<% unless @response_policy_zones.empty? -%>
+    response-policy {
+    <%- @response_policy_zones.each do |zone| -%>
+      zone "<%= zone -%>";
+    <%- end -%>
+    };
+
+<% end -%>
 <% unless @transfers.empty? -%>
     allow-transfer {
     <%- @transfers.each do |transfer| -%>

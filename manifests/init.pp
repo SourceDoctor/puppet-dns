@@ -12,6 +12,7 @@ class dns (
   Optional[Integer] $listen_on_port                = $dns::config::params::listen_on_port,
 
   Array[String] $forwarders                        = $dns::config::params::forwarders,
+  Optional[Array[String]] $response_policy_zones   = $dns::config::params::response_policy_zones,
   Optional[Enum['first', 'only']] $forward_policy  = $dns::config::params::forward_policy,
 
   Optional[Enum['warn', 'fail', 'ignore']]

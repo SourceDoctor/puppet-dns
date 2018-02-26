@@ -55,6 +55,7 @@ class dns::config::params {
   $listen_on                   = []
   $listen_on_ipv6              = []
   $forwarders                  = []
+  $response_policy_zones       = []
   $forward_policy              = undef
   $listen_on_port              = undef
   $transfers                   = []
