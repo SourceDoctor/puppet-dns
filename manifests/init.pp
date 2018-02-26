@@ -2,9 +2,9 @@ class dns (
   String $owner                                    = $dns::config::params::owner,
   String $group                                    = $dns::config::params::group,
 
-  $cfg_dir                                         = $dns::config::params::cfg_dir,
-  $data_dir                                        = $dns::config::params::data_dir,
-  $working_dir                                     = $dns::config::params::working_dir,
+  String $cfg_dir                                  = $dns::config::params::cfg_dir,
+  String $data_dir                                 = $dns::config::params::data_dir,
+  String $working_dir                              = $dns::config::params::working_dir,
 
 # options file
   Array[String] $listen_on                         = $dns::config::params::listen_on,
@@ -73,7 +73,7 @@ class dns (
   Optional[Hash] $zone                             = undef,
 
 # View
-  Optional[Hash] $view                             = undef,
+  Optional[Hash] $view                             = undef
 
 ) inherits dns::config::params {
 

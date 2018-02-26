@@ -11,8 +11,15 @@ Supports:
 * CentOS: 7.x, 6.x
 
 ## About
-This is a partial rewrite of [ajjahn puppet-dns](https://github.com/ajjahn/puppet-dns)
-for supporting hiera
+This is a partial rewrite of Puppet Module [ajjahn puppet-dns](https://github.com/ajjahn/puppet-dns) for handling bind9 DNS Server
+
+
+The differences/advantages:
+-----------------
+* DNS Settings are handled in Class DNS directly and no more in DNS::Server
+* Code was rewritten mostly for handling Puppet4 features
+* **full hiera support**
+* full support of Debian
 
 
 ## Usage
@@ -156,8 +163,3 @@ dns::zone {
   }
 ```
 
-## License
-
-This module is released under the MIT license:
-
-* [http://www.opensource.org/licenses/MIT](http://www.opensource.org/licenses/MIT)

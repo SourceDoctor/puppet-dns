@@ -1,42 +1,26 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
-require 'puppet-syntax/tasks/puppet-syntax'
 
-# These two gems aren't always present, for instance
-# on Travis with --without development
-begin
-  require 'puppetlabs_spec_helper/rake_tasks'
-  require 'puppet_blacksmith/rake_tasks'
-rescue LoadError
-end
-
-PuppetLint.configuration.send("disable_80chars")
-PuppetLint.configuration.log_format = "%{path}:%{line}:%{check}:%{KIND}:%{message}"
-
-# Forsake support for Puppet 2.6.2 for the benefit of cleaner code.
-# http://puppet-lint.com/checks/class_parameter_defaults/
-PuppetLint.configuration.send('disable_80chars')
-PuppetLint.configuration.send('disable_class_parameter_defaults')
-# http://puppet-lint.com/checks/class_inherits_from_params_class/
-PuppetLint.configuration.send('disable_class_inherits_from_params_class')
-
-exclude_paths = [
-  "pkg/**/*",
-  "vendor/**/*",
-  "spec/**/*",
+puppetlint_ignore_paths = [
+  "bundle/**/*.pp",
+  "pkg/**/*.pp",
+  "spec/**/*.pp",
+  "tests/**/*.pp",
+  "types/**/*.pp",
+  "vendor/**/*.pp",
 ]
-PuppetLint.configuration.ignore_paths = exclude_paths
-PuppetSyntax.exclude_paths = exclude_paths
 
-ENV['BEAKER_set'] ||= 'ubuntu-server-1204-x86'
-desc "Run acceptance tests"
-RSpec::Core::RakeTask.new(:acceptance) do |t|
-  t.pattern = 'spec/acceptance'
+Rake::Task[:lint].clear
+PuppetLint::RakeTask.new(:lint) do |config|
+  config.fail_on_warnings = true
+  config.disable_checks = ['80chars', 'documentation']
+  config.ignore_paths = puppetlint_ignore_paths
 end
+PuppetLint::RakeTask.new(:lint_fix) do |config|
+  config.fail_on_warnings = true
+  config.fix = true
+  config.disable_checks = ['80chars', 'documentation']
+  config.ignore_paths = puppetlint_ignore_paths
+end
+# vim: syntax=ruby
 
-desc "Run syntax, lint, and spec tests."
-task :test => [
-  :syntax,
-  :lint,
-  :spec,
-]

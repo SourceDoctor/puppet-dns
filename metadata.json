@@ -3,7 +3,7 @@
   "version": "0.9.0",
   "author": "Thomas Berberich",
   "summary": "Module for provisioning DNS (bind9)",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "source": "https://github.com/SourceDoctor/puppet-dns",
   "project_page": "https://github.com/SourceDoctor/puppet-dns",
   "issues_url": "https://github.com/SourceDoctor/puppet-dns/issues",
@@ -31,6 +31,17 @@
         "9",
         "8"
       ]
+    }
+  ],
+  "tags": [
+    "bind",
+    "bind9",
+    "dns"
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.6.1 < 5.0.0"
     }
   ],
   "dependencies": [

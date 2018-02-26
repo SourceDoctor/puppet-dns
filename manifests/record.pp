@@ -1,4 +1,3 @@
-#
 class dns::record (
   Optional[Hash] $a     = undef,
   Optional[Hash] $aaaa  = undef,
@@ -7,7 +6,7 @@ class dns::record (
   Optional[Hash] $ns    = undef,
   Optional[Hash] $srv   = undef,
   Optional[Hash] $txt   = undef,
-  Optional[Hash] $ptr   = undef,
+  Optional[Hash] $ptr   = undef
 ) {
 
   if $a {
