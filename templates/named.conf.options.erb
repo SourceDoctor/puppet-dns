@@ -27,6 +27,13 @@ options {
     forward <%= @forward_policy %>;
 
 <% end -%>
+<% if @statistics_file -%>
+    statistics-file "<%= @statistics_file %>";
+<% if @zone_statistics -%>
+    zone-statistics <%= @zone_statistics %>;
+<% end -%>
+
+<% end -%>
 <% unless @response_policy_zones.empty? -%>
     response-policy {
     <%- @response_policy_zones.each do |zone| -%>

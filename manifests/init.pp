@@ -39,6 +39,8 @@ class dns (
   Optional[Enum['yes', 'no', 'auto']]
         $dnssec_validation                         = undef,
 
+  Optional[String] $statistics_file                = undef,
+  Optional[Enum['yes', 'no']] $zone_statistics     = undef,
   Optional[String] $statistic_channel_ip           = undef,
   Optional[Integer] $statistic_channel_port        = undef,
   Optional[Array[String]] $statistic_channel_allow = undef,

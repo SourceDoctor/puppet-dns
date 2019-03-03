@@ -109,6 +109,14 @@
 #   `named_querylog` file in the `working_dir` directory.  If `false`
 #   or not defined, query logging will not be configured.
 #
+# [*statistics_file*]
+#   String of an absolute path where bind statistics will be written to.
+#   Default: undef, meaning the statistic file is disable,
+#
+# [*zone_statistics*]
+#   Boolean which decides if statistics will be sorted per zone.
+#   Default: undef, meaning the statistics will not be written per zone,
+#
 # [*statistic_channel_ip*]
 #   String of one ip for which the statistic api is bound.
 #   Default: undef, meaning the statistic channel is disable,
@@ -181,6 +189,8 @@ class dns::config::options (
   $no_empty_zones = $::dns::no_empty_zones,
   $notify_source = $::dns::notify_source,
   $query_log_enable = $::dns::query_log_enable,
+  $statistics_file = $::dns::statistics_file,
+  $zone_statistics = $::dns::zone_statistics,
   $statistic_channel_ip = $::dns::statistic_channel_ip,
   $statistic_channel_port = $::dns::statistic_channel_port,
   $statistic_channel_allow = $::dns::statistic_channel_allow,
