@@ -6,12 +6,12 @@ Module for provisioning DNS (bind9)
 
 Supports:
 
-* Ubuntu: 17.04, 16.04, 14.04, 12.04
-* Debian: 9, 8
-* CentOS: 7.x, 6.x
+* Ubuntu
+* Debian
+* CentOS
 
 ## About
-This is a partial rewrite of Puppet Module [ajjahn puppet-dns](https://github.com/ajjahn/puppet-dns) for handling bind9 DNS Server
+This is a partial rewrite of Puppet Module [ajjahn puppet-dns](https://github.com/ajjahn/puppet-dns) to be Hieara capable
 
 
 The differences/advantages:
