@@ -189,7 +189,7 @@ class dns::config::options (
   $listen_on_port = $::dns::listen_on_port,
   $log_channels = $::dns::log_channels,
   $log_categories = $::dns::log_categories,
-  $max_udp_size = undef,
+  $max_udp_size = $::dns::max_udp_size,
   $no_empty_zones = $::dns::no_empty_zones,
   $notify_source = $::dns::notify_source,
   $query_log_enable = $::dns::query_log_enable,
