@@ -83,6 +83,9 @@
 #   UDP/TCP port number to use for receiving and sending traffic.
 #   Default: undefined, meaning 53
 #
+# [*max_udp_size*]
+#   Max Size of UDP Packages. Default: undefined, meaning 1232
+#
 # [*log_categories*]
 #   Logging categories to use. It is a hash of arrays. Each key of the hash is a category
 #   and its value is the array of options. If `query_log_enable` is set to true, then
@@ -186,6 +189,7 @@ class dns::config::options (
   $listen_on_port = $::dns::listen_on_port,
   $log_channels = $::dns::log_channels,
   $log_categories = $::dns::log_categories,
+  $max_udp_size = undef,
   $no_empty_zones = $::dns::no_empty_zones,
   $notify_source = $::dns::notify_source,
   $query_log_enable = $::dns::query_log_enable,

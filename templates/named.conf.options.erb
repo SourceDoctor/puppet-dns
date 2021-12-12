@@ -166,6 +166,10 @@ controls {
 };
 <% end -%>
 
+<% if @udp_max_size -%>
+    udp-max-size <%= @udp_max_size %>;
+
+<% end -%>
 <% if @query_log_enable -%>
 logging {
 

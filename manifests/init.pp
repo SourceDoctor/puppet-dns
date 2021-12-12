@@ -25,6 +25,8 @@ class dns (
   Array[String] $allow_recursion                   = $dns::config::params::allow_recursion,
   Array[String] $allow_query                       = $dns::config::params::allow_query,
 
+  Optional[Integer] $max_udp_size                  = undef,
+
   Optional[String] $zone_notify                    = $dns::config::params::zone_notify,
   Optional[Array[String]] $also_notify             = $dns::config::params::also_notify,
 
