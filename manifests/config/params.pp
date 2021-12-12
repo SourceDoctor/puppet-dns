@@ -58,6 +58,7 @@ class dns::config::params {
   $response_policy_zones       = []
   $forward_policy              = undef
   $listen_on_port              = undef
+  $max_udp_size                = undef
   $transfers                   = []
   $allow_recursion             = []
   $allow_query                 = []

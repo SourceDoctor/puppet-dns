@@ -76,6 +76,10 @@ options {
     port <%= @listen_on_port %>;
 
 <% end -%>
+<% if @max_udp_size -%>
+    max-udp-size <%= @max_udp_size %>;
+
+<% end -%>
 <% unless @allow_recursion.empty? -%>
     allow-recursion {
     <%- @allow_recursion.each do |recursion| -%>
@@ -164,11 +168,6 @@ statistics-channels {
 controls {
     inet <%= @control_channel_ip %> port <%= @control_channel_port %><% if @control_channel_allow -%> allow { <%= @control_channel_allow.join('; ') %>; }<% end -%>;
 };
-<% end -%>
-
-<% if @udp_max_size -%>
-    udp-max-size <%= @udp_max_size %>;
-
 <% end -%>
 <% if @query_log_enable -%>
 logging {
