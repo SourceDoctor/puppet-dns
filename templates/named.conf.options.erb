@@ -140,8 +140,6 @@ options {
     <%- if @dnssec_validation != 'absent' -%>
     dnssec-validation <%= @dnssec_validation %>;
     <%- end -%>
-<% else -%>
-    dnssec-enable no;
 <% end -%>
     auth-nxdomain no;    # conform to RFC1035
 
