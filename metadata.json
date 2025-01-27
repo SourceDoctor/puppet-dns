@@ -1,6 +1,6 @@
 {
   "name": "sourcedoctor-dns",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "author": "SourceDoctor",
   "summary": "Module for provisioning DNS (bind9)",
   "license": "MIT",
@@ -31,7 +31,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.6.1 <= 6.0.0"
+      "version_requirement": ">= 4.6.1 <= 8.0.0"
     }
   ],
   "description": "Module for provisioning DNS (bind9)",
