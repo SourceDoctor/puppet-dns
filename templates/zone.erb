@@ -3,6 +3,9 @@ zone "<%= @zone %>" {
 <% if @zone_notify -%>
     notify <%= @zone_notify %>;
 <% end -%>
+<% unless @min_retry_time.nil? -%>
+    min-retry-time <%= @min_retry_time %>;
+<% end -%>
 <% if @also_notify.size != 0 -%>
     also-notify {
     <%- @also_notify.each do |ip| -%>

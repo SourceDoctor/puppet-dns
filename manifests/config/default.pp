@@ -1,12 +1,12 @@
 class dns::config::default (
-  $resolvconf            = $dns::config::resolvconf,
-  $options               = $dns::config::options,
-  $rootdir               = $dns::config::rootdir,
-  $enable_zone_write     = $dns::config::enable_zone_write,
-  $enable_sdb            = $dns::config::enable_sdb,
-  $disable_named_dbus    = $dns::config::disable_named_dbus,
-  $keytab_file           = $dns::config::keytab_file,
-  $disable_zone_checking = $dns::config::disable_zone_checking,
+  $resolvconf            = $dns::resolvconf,
+  $options               = $dns::options,
+  $rootdir               = $dns::rootdir,
+  $enable_zone_write     = $dns::enable_zone_write,
+  $enable_sdb            = $dns::enable_sdb,
+  $disable_named_dbus    = $dns::disable_named_dbus,
+  $keytab_file           = $dns::keytab_file,
+  $disable_zone_checking = $dns::disable_zone_checking,
 
 ) inherits dns {
 
@@ -20,23 +20,24 @@ class dns::config::default (
   $default_file      = $dns::config::params::default_file
   $default_template  = $dns::config::params::default_template
 
-  validate_absolute_path( $default_file )
+  Stdlib::Absolutepath( $default_file )
 
   if $rootdir != undef {
-    validate_absolute_path( $rootdir )
+    Stdlib::Absolutepath( $rootdir )
   }
 
   if $keytab_file != undef {
-    validate_absolute_path( $keytab_file )
+    Stdlib::Absolutepath( $keytab_file )
   }
 
   file { $default_file:
     ensure  => present,
-    owner   => $::dns::config::owner,
-    group   => $::dns::config::group,
+    owner   => $::dns::config::params::owner,
+    group   => $::dns::config::params::group,
     mode    => '0644',
     content => template("${module_name}/${default_template}"),
     notify  => Class['dns::config::service'],
-    require => Package[$::dns::config::necessary_packages]
+    require => Package[$::dns::config::params::necessary_packages]
   }
 }
+

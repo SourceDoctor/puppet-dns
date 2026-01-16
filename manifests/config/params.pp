@@ -1,5 +1,5 @@
 class dns::config::params {
-  case $::osfamily {
+  case $facts['os']['family'] {
     'Debian': {
       $cfg_dir            = '/etc/bind'
       $cfg_file           = "${cfg_dir}/named.conf"
@@ -16,11 +16,7 @@ class dns::config::params {
       $default_template   = 'default.debian.erb'
       $default_dnssec_enable     = true
       $default_dnssec_validation = 'auto'
-      if versioncmp( $::operatingsystemmajrelease, '8' ) >= 0 {
-        $necessary_packages = ['bind9']
-      } else {
-        $necessary_packages = [ 'bind9', 'dnssec-tools' ]
-      }
+      $necessary_packages = ['bind9']
     }
     'RedHat': {
       $cfg_dir            = '/etc/named'
@@ -37,7 +33,7 @@ class dns::config::params {
       $necessary_packages = [ 'bind', ]
       $default_file       = '/etc/sysconfig/named'
       $default_template   = 'default.redhat.erb'
-      if $::operatingsystemmajrelease =~ /^[1-5]$/ {
+      if $facts['os']['release']['major'] =~ /^[1-5]$/ {
         $default_dnssec_enable     = false
         $default_dnssec_validation = 'absent'
       } else {
@@ -46,7 +42,7 @@ class dns::config::params {
       }
     }
     default: {
-      fail("dns is incompatible with this osfamily: ${::osfamily}")
+      fail("dns is incompatible with this osfamily: ${facts['os']['family']}")
     }
   }
 
@@ -74,3 +70,4 @@ class dns::config::params {
   $log_categories              = {}
   $extra_options               = {}
 }
+

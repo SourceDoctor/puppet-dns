@@ -169,15 +169,15 @@
 #   Defaults to `master`.
 #
 define dns::config::zone (
-  $soa = $::fqdn,
-  $soa_email = "root.${::fqdn}",
+  $soa = $servername,
+  $soa_email = "root.$servername",
   $zone_name = $name,
   $zone_ttl = '604800',
   $zone_refresh = '604800',
   $zone_retry = '86400',
   $zone_expire = '2419200',
   $zone_minimum = '604800',
-  $nameservers = [ $::fqdn ],
+  $nameservers = [ $servername ],
   $reverse = false,
   $serial = false,
   $zone_type = 'master',
@@ -188,6 +188,7 @@ define dns::config::zone (
   $allow_update =[],
   $forward_policy = 'first',
   $slave_masters = undef,
+  $min_retry_time = undef,
   $zone_notify = undef,
   $also_notify = [],
   $ensure = present,
@@ -203,14 +204,10 @@ define dns::config::zone (
 
   $rfc1912_zones_cfg = $dns::config::params::rfc1912_zones_cfg
 
-  validate_array($allow_transfer)
-  validate_array($allow_forwarder)
   if !member(['first', 'only'], $forward_policy) {
     fail('The forward policy can only be set to either first or only')
   }
-  validate_array($allow_query)
 
-  validate_array($also_notify)
   $valid_zone_notify = ['yes', 'no', 'explicit', 'master-only']
   if $zone_notify != undef and !member($valid_zone_notify, $zone_notify) {
     fail("The zone_notify must be ${valid_zone_notify}")
@@ -222,7 +219,6 @@ define dns::config::zone (
     default   => $zone_name
   }
 
-  validate_string($zone_type)
   $valid_zone_type_array = ['master', 'slave', 'stub', 'forward', 'delegation-only']
   if !member($valid_zone_type_array, $zone_type) {
     $valid_zone_type_array_str = join($valid_zone_type_array, ',')
@@ -232,21 +228,12 @@ define dns::config::zone (
   $zone_file = "${data_dir}/db.${zone_name}"
   $zone_file_stage = "${zone_file}.stage"
 
-  validate_array($allow_update)
   # Replace when updates allowed
   if empty($allow_update) {
     $zone_replace = true
   } else {
     $zone_replace = false
   }
-
-  if $view {
-    validate_string($view)
-  }
-
-  validate_bool($create_zone_file)
-
-  validate_bool($default_zone)
 
   if $view and $default_zone == true {
     fail('view and default parameters are mutually excluding')
@@ -313,3 +300,4 @@ define dns::config::zone (
     content => template("${module_name}/zone.erb"),
   }
 }
+

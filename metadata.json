@@ -1,6 +1,6 @@
 {
   "name": "sourcedoctor-dns",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "author": "SourceDoctor",
   "summary": "Module for provisioning DNS (bind9)",
   "license": "MIT",
@@ -14,7 +14,7 @@
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">=2.4.0 <6.0.0"
+      "version_requirement": ">=5.5.8 <10.0.0"
     }
   ],
   "operatingsystem_support": [

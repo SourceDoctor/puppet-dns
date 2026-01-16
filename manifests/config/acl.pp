@@ -23,9 +23,6 @@ define dns::config::acl (
 
   $cfg_dir = $dns::cfg_dir
 
-  validate_string($aclname)
-  validate_array($data)
-
   concat::fragment { "named.conf.local.acl.${aclname}.include":
     target  => "${cfg_dir}/named.conf.local",
     order   => 2,

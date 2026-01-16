@@ -67,16 +67,9 @@ define dns::config::view (
   if !member($valid_ensure, $ensure) {
     fail("ensure parameter must be ${valid_ensure}")
   }
-  validate_bool($enable_default_zones)
-  validate_array($match_clients)
-  validate_array($match_destinations)
   if $match_recursive_only != undef {
       validate_bool($match_recursive_only)
   }
-  validate_hash($options)
-  validate_string($order)
-  validate_string($viewname)
-  validate_hash($zones)
 
   concat { "${cfg_dir}/view-${viewname}.conf":
     ensure         => $ensure,
@@ -112,3 +105,4 @@ define dns::config::view (
     create_resources(dns::config::zone, $zones, { view => $viewname })
   }
 }
+

@@ -173,7 +173,7 @@ class dns::config::options (
   $also_notify = $::dns::also_notify,
   $check_names_master = $::dns::check_names_master,
   $check_names_slave = $::dns::check_names_slave,
-  $check_names_response = $::dns::check_names_reponse,
+  $check_names_response = $::dns::check_names_response,
   $control_channel_ip = undef,
   $control_channel_port = undef,
   $control_channel_allow = undef,
@@ -216,3 +216,4 @@ class dns::config::options (
     notify  => Class['dns::config::service'],
   }
 }
+

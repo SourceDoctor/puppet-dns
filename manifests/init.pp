@@ -82,9 +82,9 @@ class dns (
 
 ) inherits dns::config::params {
 
-  validate_absolute_path($cfg_dir)
-  validate_absolute_path($data_dir)
-  validate_absolute_path($working_dir)
+  Stdlib::Absolutepath($cfg_dir)
+  Stdlib::Absolutepath($data_dir)
+  Stdlib::Absolutepath($working_dir)
 
   include dns::config::install
   include dns::config::default
@@ -112,3 +112,4 @@ class dns (
     create_resources('dns::config::view', $view)
   }
 }
+
